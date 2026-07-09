@@ -1,9 +1,12 @@
+import os
 import streamlit as st
 import requests
 
-API_URL = "http://127.0.0.1:8000/ask"
-STATS_URL = "http://127.0.0.1:8000/stats"
-HEALTH_URL = "http://127.0.0.1:8000/health"
+BASE_API_URL = os.getenv("API_URL", "http://127.0.0.1:8000")
+
+API_URL = f"{BASE_API_URL}/ask"
+STATS_URL = f"{BASE_API_URL}/stats"
+HEALTH_URL = f"{BASE_API_URL}/health"
 
 st.set_page_config(page_title="SQL-RAG-Analyst", page_icon="📊", layout="centered")
 

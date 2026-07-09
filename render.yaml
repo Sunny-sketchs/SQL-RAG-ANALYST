@@ -1,0 +1,40 @@
+services:
+  # -------------------------
+  # BACKEND: FastAPI Service
+  # -------------------------
+  - type: web
+    name: sql-rag-backend
+    env: python
+    region: singapore
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn src.app.main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      # These values will be left blank here so they don't commit to GitHub.
+      # You will paste the real values into the Render dashboard later.
+      - key: DATABASE_URL
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
+
+  # -------------------------
+  # FRONTEND: Streamlit App
+  # -------------------------
+  - type: web
+    name: sql-rag-frontend
+    env: python
+    region: singapore
+    buildCommand: pip install -r requirements.txt
+    startCommand: streamlit run frontend/app.py --server.port $PORT --server.address 0.0.0.0
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.0
+      # Automatically pass the backend's internal URL to the frontend
+      - key: API_URL
+        fromService:
+          type: web
+          name: sql-rag-backend
+          envVarKey: RENDER_INTERNAL_URL
