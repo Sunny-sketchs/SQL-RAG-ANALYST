@@ -42,6 +42,18 @@ sales(id, order_number, sales_channel, warehouse_code, procured_date, order_date
       ship_date, delivery_date, currency_code, sales_team_id, customer_id, store_id,
       product_id, order_quantity, discount_applied, unit_cost, unit_price)
 
+CRITICAL: the question may contain concepts that do NOT exist in this schema
+(e.g. "top performers", "remote employees", "commission tier", "standard
+commission eligibility" — these belong to company policy documents, not this
+table). Never invent a WHERE filter, column alias, or literal value to
+represent a concept that has no corresponding column in the schema above.
+If the question asks about such a concept alongside a real data question,
+answer ONLY the data-only part exactly as if the non-schema concept were not
+mentioned at all — do not filter, do not guess, do not fabricate a value.
+For example: "What is the commission tier for top performers and what is the
+average unit price?" should produce SELECT AVG(unit_price) FROM sales — nothing
+about "top performers" or "commission tier", since neither exists in the schema.
+
 IMPORTANT: discount_applied is stored as a decimal fraction, not a whole-number
 percentage. A 20% discount is stored as 0.20, a 5% discount as 0.05. When the
 question mentions a percentage (e.g. "discount above 20%"), convert it to the
@@ -68,26 +80,37 @@ any general or ambiguous time reference ("in June 2018", "last quarter",
 "this year"), default to order_date unless the question explicitly says
 "shipped", "delivered", or "procured".
 
-CRITICAL: the question may contain concepts that do NOT exist in this schema
-(e.g. "top performers", "remote employees", "commission tier", "standard
-commission eligibility" — these belong to company policy documents, not this
-table). Never invent a WHERE filter, column alias, or literal value to
-represent a concept that has no corresponding column in the schema above.
-If the question asks about such a concept alongside a real data question,
-answer ONLY the data-only part exactly as if the non-schema concept were not
-mentioned at all — do not filter, do not guess, do not fabricate a value.
-For example: "What is the commission tier for top performers and what is the
-average unit price?" should produce SELECT AVG(unit_price) FROM sales — nothing
-about "top performers" or "commission tier", since neither exists in the schema.
+IMPORTANT: never construct partial date strings like '10-01' — Postgres
+cannot parse these as timestamps. For quarter-based filtering across all
+years, use EXTRACT(QUARTER FROM column_name) = N (e.g.
+WHERE EXTRACT(QUARTER FROM ship_date) = 4), not date range comparisons,
+unless a specific year is explicitly stated in the question.
+
+IMPORTANT: "total revenue" or "revenue" means net of discount by default —
+SUM(order_quantity * unit_price * (1 - discount_applied)) — unless the
+question explicitly asks for gross/pre-discount figures.
 
 Question: {query}
 
 Return ONLY the SQL query, no explanation, no markdown fences.
 """
 
-SYNTHESIS_PROMPT = """Answer the user's question using only the context provided below.
-Cite which source (SQL result or document name) supports each claim. If the context is
-insufficient, say so plainly rather than guessing.
+SYNTHESIS_PROMPT = """Answer the user's question using ONLY the context provided below. Do not use
+any outside knowledge, assumptions, or general familiarity with typical business policies — if the
+answer isn't clearly supported by the SQL context or document context given here, say so explicitly
+rather than filling the gap with plausible-sounding information.
+
+Cite which source (SQL result or document name) supports each claim.
+
+IMPORTANT: a numeric result of 0 is a valid, complete answer (e.g. "0 orders
+match this condition") — do not treat a zero count or empty aggregate as
+missing or insufficient context.
+
+IMPORTANT: when a policy describes a schedule or range across labeled periods
+(e.g. "Month 1-2", "Month 3-4"), do not perform arithmetic to summarize a
+total unless you show your reasoning — count the actual periods listed
+rather than guessing a round number. If asked for a total count derived from
+listed items, count them explicitly rather than estimating.
 
 Question: {query}
 

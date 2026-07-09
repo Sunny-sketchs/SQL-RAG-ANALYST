@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     llm_model: str = "gpt-4o-mini"
     embedding_model: str = "text-embedding-3-small"
 
-    daily_token_limit: int = 50_000  # per-user daily cap across all nodes
+    daily_token_limit: int = 500_000  # per-user daily cap across all nodes
 
     log_level: str = "INFO"
     app_name: str = "SQL-RAG-Analyst"

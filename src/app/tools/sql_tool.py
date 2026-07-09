@@ -1,5 +1,7 @@
 import re
 import logging
+from datetime import timedelta
+from decimal import Decimal
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -25,6 +27,17 @@ def _validate_sql(sql: str) -> str:
     return sql
 
 
+def _serialize_value(v):
+    """Convert DB types that render awkwardly as raw Python repr (timedelta,
+    Decimal) into plain, LLM-friendly values before they hit the synthesis
+    prompt as text."""
+    if isinstance(v, timedelta):
+        return round(v.total_seconds() / 86400, 2)  # days, as a plain float
+    if isinstance(v, Decimal):
+        return float(v)
+    return v
+
+
 async def run_sql_tool(query: str, session: AsyncSession) -> tuple[str, int]:
     llm = get_llm()
     prompt = SQL_GEN_PROMPT.format(query=query)
@@ -47,6 +60,7 @@ async def run_sql_tool(query: str, session: AsyncSession) -> tuple[str, int]:
         rows = result.fetchall()
         columns = result.keys()
     except Exception as e:
+        await session.rollback()
         logger.error("SQL execution failed: %s | SQL: %s", e, sql)
         return f"SQL execution failed: {e}", tokens
 
@@ -54,6 +68,9 @@ async def run_sql_tool(query: str, session: AsyncSession) -> tuple[str, int]:
         logger.info("SQL_GEN query returned no rows: %s", sql)
         return "Query returned no rows.", tokens
 
-    formatted = [dict(zip(columns, row)) for row in rows]
+    formatted = [
+        {col: _serialize_value(val) for col, val in zip(columns, row)}
+        for row in rows
+    ]
     logger.info("SQL_GEN result: %s", formatted)
     return str(formatted), tokens

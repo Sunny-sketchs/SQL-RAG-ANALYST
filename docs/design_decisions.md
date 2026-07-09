@@ -195,3 +195,110 @@ script's dotenv call, not just the config file. Worth noting as a real
 "what went wrong during development" story, and a good argument for
 containerizing local dev (e.g. via Docker) in a future iteration to
 eliminate shell-specific inconsistencies entirely.
+
+## Additional bugs found via extended live testing and logging
+
+A second, longer debugging session (following the initial three SQL bugs)
+uncovered five more real issues, again found through structured logging
+rather than guessing from output text alone.
+
+**4. Failed SQL execution left the async session in a broken transaction
+state.** When `sql_tool`'s SQL execution failed (e.g. malformed SQL from the
+LLM), the exception was caught and returned as an error string, but the
+database session was never rolled back. In hybrid queries, this meant the
+*next* tool call on the same session (the RAG vector search) would also
+fail, cascading a single SQL error into a full request failure (502). Fixed
+by calling `await session.rollback()` in the exception handler before
+returning the error message.
+
+**5. LLM occasionally generated invalid partial-date SQL and hardcoded
+nonexistent years.** For quarter-based questions phrased as "across all
+years," the LLM sometimes constructed malformed date strings like
+`ship_date >= '10-01'` (no year, unparseable by Postgres) or filtered
+against a specific year that doesn't exist in the dataset (e.g. `2023`, when
+the data spans 2017–2020). Fixed by instructing the LLM to use
+`EXTRACT(QUARTER FROM column)` for year-agnostic quarter filtering, and to
+never assume a specific year unless one is explicitly stated in the question.
+
+**6. "Revenue" and "profit" were ambiguous — LLM inconsistently applied the
+discount factor.** Without an explicit definition, the LLM sometimes
+included `(1 - discount_applied)` in aggregate calculations and sometimes
+didn't, producing different totals for what should have been the same
+metric across different phrasings of the same underlying question. Fixed by
+explicitly defining both terms in `SQL_GEN_PROMPT`: revenue is net of
+discount, profit is likewise calculated as discount-adjusted margin
+(`SUM(order_quantity * (unit_price - unit_cost) * (1 - discount_applied))`),
+matching real-world accounting treatment.
+
+**7. Timedelta results serialized as raw Python repr, unreadable by the
+synthesis LLM.** Date-difference queries (e.g. average delivery time)
+correctly computed a Postgres `INTERVAL`, but when converted to Python via
+SQLAlchemy this became a `datetime.timedelta(days=20, seconds=58137, ...)`
+object. `str()`-ing this into the SQL context for synthesis produced
+Python-internal notation that the LLM had to awkwardly interpret, rather
+than a clean number. Fixed by adding a serialization step in `sql_tool.py`
+that converts `timedelta` to a plain float (days) and `Decimal` to `float`
+before formatting results for the LLM.
+
+**8. LLM answered from training knowledge instead of retrieved context
+(grounding failure).** For a RAG-only question about expense receipt
+requirements, the correct source chunk (Parking/Tolls policy text) was
+confirmed present in the top-5 retrieved chunks via logging — but the
+synthesis LLM answered about "Client Entertainment" instead, a plausible-
+sounding but incorrect answer that appears nowhere in the retrieved context.
+This is a genuine RAG failure mode: the LLM's general familiarity with
+typical corporate expense policies overrode the specific retrieved
+document. Confirmed via `rag_tool` logging that this was a synthesis issue,
+not a retrieval issue — the right chunk was there, the model just didn't
+use it. Fixed by strengthening `SYNTHESIS_PROMPT`'s grounding instruction
+to explicitly name and prohibit this failure mode ("do not use any outside
+knowledge, assumptions, or general familiarity with typical business
+policies"), not just implicitly ask it to "use the context provided."
+
+**Lesson**: a soft grounding instruction ("answer using the context below")
+is not sufficient to prevent an LLM from substituting its own training
+knowledge when the retrieved context doesn't closely match the question's
+phrasing. Explicit, named prohibition of the failure mode was needed.
+
+## Eval harness bugs (separate from pipeline bugs)
+
+Two bugs were found in the eval harness itself, not the system under test —
+worth distinguishing, since both could have caused real bugs to look like
+false passes or false failures:
+
+- **CSV comma-in-unquoted-field bug**: `expected_facts` values containing
+  commas (e.g. "natural disasters, major economic events, ...") were not
+  wrapped in quotes, causing the CSV parser to silently split the field at
+  the first comma and shift the remainder into the next column
+  (`ground_truth_sql`), which then got executed as literal SQL and crashed
+  with a syntax error. Fixed by quoting all comma-containing fields, and by
+  adding `scripts/validate_eval_csv.py` — a standalone validator that checks
+  every row's structure and actually executes every `ground_truth_sql`
+  against the real database before an eval run, catching this class of
+  authoring error immediately rather than mid-run.
+- **Decimal/timedelta type handling in grading logic**: an early version of
+  `value_match()` only checked `isinstance(expected, (int, float))`, which
+  silently failed to recognize `Decimal` (returned by Postgres for
+  `::numeric` casts) as numeric, causing correct answers to be graded as
+  failures. This is the same class of bug as the pipeline's own timedelta
+  serialization issue (#7 above) — a reminder that grading/test code needs
+  the same type-handling scrutiny as the system it's testing, not less.
+
+## Known remaining limitation: qualitative grading sensitivity
+
+After all fixes above, a full 50-question eval run scored 40/50 (80%),
+improved further after the fixes in this section. Manual inspection of
+several remaining "failures" showed the underlying system answer was
+factually correct, but the LLM-judge grader marked it wrong because
+`expected_facts` in the eval CSV named one specific supporting detail
+(e.g. a particular commission sub-rule) rather than the general claim being
+tested, and the system's correct answer happened to cite a different, also-
+valid supporting detail from the same policy document.
+
+This is a real limitation of the current eval design, not a pipeline bug —
+distinguishing "the system is wrong" from "the grader's expected answer was
+too narrowly specified" required manually re-running each failing question
+live and reading the actual answer, which does not scale well past a
+handful of cases. Deferred as a known area for improvement (broader
+`expected_facts` phrasing, or a more sophisticated grading rubric) rather
+than hand-fixing every remaining case, given time constraints.
