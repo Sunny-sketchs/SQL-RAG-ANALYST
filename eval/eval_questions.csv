@@ -1,0 +1,16 @@
+id,category,question,expected_facts,ground_truth_sql
+1,sql_only,What is the total order quantity across all sales?,,"SELECT SUM(order_quantity) FROM sales"
+2,sql_only,How many orders have a discount above 20 percent?,,"SELECT COUNT(*) FROM sales WHERE discount_applied > 0.20"
+3,sql_only,What sales channel had the most orders?,,"SELECT sales_channel FROM sales GROUP BY sales_channel ORDER BY COUNT(*) DESC LIMIT 1"
+4,sql_only,What is the average unit price across all sales?,,"SELECT ROUND(AVG(unit_price)::numeric, 2) FROM sales"
+5,rag_only,What is the commission approval threshold for discounts above 20 percent?,Discounts above 20% are excluded from commission-eligible revenue and require Finance review,
+6,rag_only,What discount level requires regional sales manager sign-off?,Discounts between 15% and 25% require regional sales manager sign-off,
+7,rag_only,What is the monthly remote work stipend for sales team members?,$50 per month for fully remote sales team members,
+8,rag_only,How is quota reduced when a team member leaves mid-cycle?,Pro-rated reduction based on days without replacement divided by total days in the quarter,
+9,hybrid,Does a 25 percent discount comply with commission policy and how many orders in our data have a discount above 20 percent?,Discounts above 20% require Finance review per commission policy,"SELECT COUNT(*) FROM sales WHERE discount_applied > 0.20"
+10,hybrid,What is the expense policy for parking and what is the total order quantity in our sales data?,Parking is reimbursed at actual cost with receipt,"SELECT SUM(order_quantity) FROM sales"
+11,hybrid,What is the commission tier for top performers and what is the average unit price in our sales data?,125%+ attainment gets the Accelerated Tier at 6% total commission,"SELECT ROUND(AVG(unit_price)::numeric, 2) FROM sales"
+12,hybrid,Are online sales channel orders eligible for standard commission and how many online orders exist?,Commission policy does not distinguish standard commission eligibility by sales channel; all channels use the same tiered structure,"SELECT COUNT(*) FROM sales WHERE sales_channel = 'Online'"
+13,hybrid,What is the setup allowance for remote employees and how many distinct sales teams appear in our data?,$200 one-time setup allowance for remote employees,"SELECT COUNT(DISTINCT sales_team_id) FROM sales"
+14,sql_only,How many orders were placed through the Distributor channel and what is the average discount applied,,"SELECT COUNT(*) FROM sales WHERE sales_channel = 'Distributor'"
+15,rag_only,What is the commission threshold for discounts above 20 percent and what is the new hire quota ramp schedule,Discounts above 20% require Finance review and new hires ramp at 50% in months 1-2 then 75% in months 3-4,

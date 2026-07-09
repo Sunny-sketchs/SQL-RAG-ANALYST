@@ -1,0 +1,49 @@
+QUOTA EXCEPTIONS POLICY
+Effective Date: January 1, 2026
+Version: 1.0
+
+NEW HIRE AND EXCEPTION QUOTA RULES
+
+New Sales Team Member Ramp Schedule:
+- Month 1-2: 50% of standard team quota
+- Month 3-4: 75% of standard team quota
+- Month 5+: 100% of standard team quota
+
+Example:
+- Standard team quota: $100,000/month
+- New hire Month 1: $50,000 quota
+- New hire Month 3: $75,000 quota
+- New hire Month 5: $100,000 quota
+
+Mid-Quarter Team Member Loss:
+- Teams that lost a member mid-quarter receive a pro-rated quota reduction 
+  equal to (days without replacement / total days in quarter) × standard quota, 
+  applied at quarter-end reconciliation.
+
+Example:
+- Standard team quota: $300,000/quarter (90 days)
+- Team member leaves on day 30 (60 days remaining without replacement)
+- Quota reduction: (60 / 90) × $300,000 = $200,000
+- Adjusted team quota: $300,000 - $200,000 = $100,000
+
+Regional Market Disruption Exceptions:
+- Teams in regions affected by a documented market disruption 
+  (e.g., a named regional event) may apply for a one-time quota adjustment 
+  via the Sales Operations exception form.
+
+Eligible Disruptions:
+- Natural disasters (hurricanes, earthquakes, floods)
+- Major economic events (market crashes, industry downturns)
+- Infrastructure failures (power outages, internet outages)
+- Regulatory changes affecting the region
+- Major competitor actions or market consolidation
+
+Exception Request Process:
+1. Sales manager submits exception form to Sales Operations
+2. Form includes: disruption description, impact analysis, quota adjustment request
+3. Sales Operations reviews with Finance and VP Sales
+4. Decision made within 5 business days
+5. Adjustment applied retroactively to quarter start if approved
+
+Approved by: VP Sales Operations
+Last Updated: July 4, 2026

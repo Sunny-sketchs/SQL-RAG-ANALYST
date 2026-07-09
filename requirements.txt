@@ -1,0 +1,44 @@
+# Core Environment Management & Configuration
+python-dotenv>=1.0.1
+pydantic-settings>=2.2.1
+
+# Database Layer & Drivers
+SQLAlchemy>=2.0.30
+psycopg2-binary>=2.9.9
+pgvector>=0.2.5
+sqlalchemy-utils>=0.42.1
+asyncpg
+
+# OpenAI Core SDK
+openai>=2.44.0
+
+# Gemini SDK — needed once llm/provider.py's OpenAI|Gemini switch is implemented
+google-generativeai>=0.8.0
+
+# Stable LangChain & Agent Orchestration (2026 Releases)
+langchain-core>=1.4.8
+langchain-openai>=1.3.3
+langchain>=1.3.11
+langchain-text-splitters>=1.0.0
+langgraph>=1.2.7
+
+# Web API Gateway (FastAPI Backend)
+fastapi>=0.110.0
+uvicorn>=0.28.0
+
+# Data Processing, Extraction & Parsing
+pandas>=2.2.0
+pypdf>=4.2.0
+camelot-py>=2.0.0
+opencv-python-headless>=4.9.0.80
+
+# Frontend Interface Dashboard
+streamlit>=1.32.0
+requests>=2.31.0
+
+pytest
+pytest-asyncio
+
+angchain-google-genai
+httpx
+streamlit-requests

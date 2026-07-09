@@ -1,0 +1,34 @@
+COMMISSION POLICY
+Effective Date: January 1, 2026
+Version: 1.0
+
+COMMISSION TIERS BY QUOTA ATTAINMENT
+
+Base Commission Rate:
+- 3% of net sales (after discount) for all sales teams
+
+Tier Structure (based on quarterly quota attainment):
+- Below 80% attainment: Base rate only (3%)
+- 80-99% attainment: Base rate + 0.5% bonus (3.5% total)
+- 100-124% attainment: Base rate + 1.5% bonus (4.5% total)
+- 125%+ attainment ("Accelerated Tier"): Base rate + 3% bonus (6% total)
+
+Regional Modifier:
+- Teams in the West region receive an additional 0.5% on top of their tier rate, 
+  due to higher cost-of-living adjustments.
+
+Exclusions:
+- Commission is calculated on net sales after discount_applied.
+- Orders with a discount above 20% are excluded from commission-eligible revenue 
+  and require Finance review (see Discount Approval Policy).
+
+Calculation Example:
+- Sales Rep in West region with 110% quota attainment
+- Gross Sales: $100,000
+- Discount Applied: 10%
+- Net Sales: $90,000
+- Commission Rate: 4.5% (base 3% + 1.5% bonus) + 0.5% (West modifier) = 5%
+- Commission Earned: $90,000 × 5% = $4,500
+
+Approved by: VP Sales Operations
+Last Updated: July 4, 2026

@@ -1,0 +1,178 @@
+{
+  "date": "2026-07-08",
+  "total": 13,
+  "passed": 9,
+  "accuracy": 0.692,
+  "by_category": {
+    "sql_only": {
+      "total": 4,
+      "passed": 3
+    },
+    "rag_only": {
+      "total": 4,
+      "passed": 4
+    },
+    "hybrid": {
+      "total": 5,
+      "passed": 2
+    }
+  },
+  "results": [
+    {
+      "id": "1",
+      "category": "sql_only",
+      "question": "What is the total order quantity across all sales?",
+      "expected_route": "sql",
+      "actual_route": "sql",
+      "route_ok": true,
+      "content_ok": true,
+      "grader_note": "ground_truth=36162, found_in_answer=[36162.0]",
+      "passed": true,
+      "answer": "The total order quantity across all sales is 36,162. This information is supported by the SQL result."
+    },
+    {
+      "id": "2",
+      "category": "sql_only",
+      "question": "How many orders have a discount above 20 percent?",
+      "expected_route": "sql",
+      "actual_route": "sql",
+      "route_ok": true,
+      "content_ok": true,
+      "grader_note": "ground_truth=667, found_in_answer=[667.0, 20.0]",
+      "passed": true,
+      "answer": "There are 667 orders that have a discount above 20 percent. This information is supported by the SQL result."
+    },
+    {
+      "id": "3",
+      "category": "sql_only",
+      "question": "What sales channel had the most orders?",
+      "expected_route": "sql",
+      "actual_route": "sql",
+      "route_ok": true,
+      "content_ok": true,
+      "grader_note": "ground_truth=In-Store, found_in_answer=n/a",
+      "passed": true,
+      "answer": "The sales channel that had the most orders is \"In-Store\" with a total of 3,298 orders. This information is supported by the SQL result."
+    },
+    {
+      "id": "4",
+      "category": "sql_only",
+      "question": "What is the average unit price across all sales?",
+      "expected_route": "sql",
+      "actual_route": "sql",
+      "route_ok": true,
+      "content_ok": false,
+      "grader_note": "ground_truth=2284.54, found_in_answer=n/a",
+      "passed": false,
+      "answer": "The average unit price across all sales is 2284.54. This information is supported by the SQL result."
+    },
+    {
+      "id": "5",
+      "category": "rag_only",
+      "question": "What is the commission approval threshold for discounts above 20 percent?",
+      "expected_route": "rag",
+      "actual_route": "rag",
+      "route_ok": true,
+      "content_ok": true,
+      "grader_note": "qualitative=ok",
+      "passed": true,
+      "answer": "The commission approval threshold for discounts above 20 percent is that such discounts are excluded from commission-eligible revenue and require Finance review. This is supported by the document titled [COMMISSION POLICY.pdf], which states, \"Orders with a discount above 20% are excluded from commission-eligible revenue and require Finance review.\" \n\nAdditionally, the [DISCOUNT APPROVAL POLICY.pdf] specifies that discounts greater than 20% are reviewed under the Finance Adjustment process, further confirming the requirement for Finance review."
+    },
+    {
+      "id": "6",
+      "category": "rag_only",
+      "question": "What discount level requires regional sales manager sign-off?",
+      "expected_route": "rag",
+      "actual_route": "rag",
+      "route_ok": true,
+      "content_ok": true,
+      "grader_note": "qualitative=ok",
+      "passed": true,
+      "answer": "Discounts between 15% and 25% require sign-off from the regional sales manager. This is supported by the document titled \"DISCOUNT APPROVAL POLICY.pdf,\" which states: \"Discounts between 15% and 25% require sign-off from the regional sales manager, logged in the order notes field.\""
+    },
+    {
+      "id": "7",
+      "category": "rag_only",
+      "question": "What is the monthly remote work stipend for sales team members?",
+      "expected_route": "rag",
+      "actual_route": "rag",
+      "route_ok": true,
+      "content_ok": true,
+      "grader_note": "qualitative=ok",
+      "passed": true,
+      "answer": "The monthly remote work stipend for sales team members is $50. This is supported by the document titled [EXPENSE & TRAVEL POLICY.pdf], which states: \"Home Office Stipend: - $50/month for fully remote sales team members.\""
+    },
+    {
+      "id": "8",
+      "category": "rag_only",
+      "question": "How is quota reduced when a team member leaves mid-cycle?",
+      "expected_route": "rag",
+      "actual_route": "rag",
+      "route_ok": true,
+      "content_ok": true,
+      "grader_note": "qualitative=ok",
+      "passed": true,
+      "answer": "When a team member leaves mid-cycle, the quota is reduced by a pro-rated amount based on the number of days remaining in the quarter without a replacement. Specifically, the formula used for the quota reduction is:\n\nQuota reduction = (days without replacement / total days in quarter) \u00d7 standard quota.\n\nFor example, if a team member leaves on day 30 of a 90-day quarter, with 60 days remaining without a replacement, the calculation would be:\n\nQuota reduction = (60 / 90) \u00d7 $300,000 = $200,000.\n\nThis results in an adjusted team quota of $300,000 - $200,000 = $100,000.\n\nThis information is supported by the document titled [QUOTA EXCEPTIONS POLICY.pdf]."
+    },
+    {
+      "id": "9",
+      "category": "hybrid",
+      "question": "Does a 25 percent discount comply with commission policy and how many orders in our data have a discount above 20 percent?",
+      "expected_route": "hybrid",
+      "actual_route": "hybrid",
+      "route_ok": true,
+      "content_ok": false,
+      "grader_note": "ground_truth=667, found_in_answer=[25.0, 15.0, 25.0, 20.0, 667.0, 20.0, 20.0, 20.0, 15.0, 25.0] | qualitative=FAILED",
+      "passed": false,
+      "answer": "A 25 percent discount does not comply with the commission policy because discounts between 15% and 25% require sign-off from the regional sales manager, and any order with a discount above 20% is excluded from commission-eligible revenue and requires Finance review (see Commission Policy and Discount Approval Policy). \n\nThe SQL context indicates that there are 667 orders in the data, but it does not specify how many of those have a discount above 20 percent. Therefore, the context is insufficient to answer how many orders have a discount above 20 percent.\n\n**Sources:**\n- Commission Policy: \"Orders with a discount above 20% are excluded from commission-eligible revenue and require Finance review.\"\n- Discount Approval Policy: \"Discounts between 15% and 25% require sign-off from the regional sales manager.\""
+    },
+    {
+      "id": "10",
+      "category": "hybrid",
+      "question": "What is the expense policy for parking and what is the total order quantity in our sales data?",
+      "expected_route": "hybrid",
+      "actual_route": "hybrid",
+      "route_ok": true,
+      "content_ok": true,
+      "grader_note": "ground_truth=36162, found_in_answer=[36162.0] | qualitative=ok",
+      "passed": true,
+      "answer": "The expense policy for parking states that parking expenses are reimbursed at actual cost with a receipt. This is supported by the document titled \"EXPENSE & TRAVEL POLICY.pdf.\"\n\nThe total order quantity in our sales data is 36,162. This is supported by the SQL result provided."
+    },
+    {
+      "id": "11",
+      "category": "hybrid",
+      "question": "What is the commission tier for top performers and what is the average unit price in our sales data?",
+      "expected_route": "hybrid",
+      "actual_route": "hybrid",
+      "route_ok": true,
+      "content_ok": false,
+      "grader_note": "ground_truth=2284.54, found_in_answer=n/a | qualitative=FAILED",
+      "passed": false,
+      "answer": "The commission tier for top performers is \"Top Performers,\" and the average unit price in the sales data is approximately $2397.71. \n\nThis information is supported by the SQL result: \n- Commission tier: 'Top Performers' \n- Average unit price: 2397.705997001504."
+    },
+    {
+      "id": "12",
+      "category": "hybrid",
+      "question": "Are online sales channel orders eligible for standard commission and how many online orders exist?",
+      "expected_route": "hybrid",
+      "actual_route": "hybrid",
+      "route_ok": true,
+      "content_ok": false,
+      "grader_note": "ground_truth=2425, found_in_answer=[0.0, 0.0, 0.0, 0.0] | qualitative=FAILED",
+      "passed": false,
+      "answer": "Online sales channel orders are not eligible for standard commission, as indicated by the SQL result showing that there are 0 online orders. Therefore, there are no online orders to be considered for commission eligibility. \n\n- Claim: Online sales channel orders are not eligible for standard commission. \n  - Source: SQL result [\u2018online_order_count\u2019: 0].\n\n- Claim: There are 0 online orders.\n  - Source: SQL result [\u2018online_order_count\u2019: 0]."
+    },
+    {
+      "id": "13",
+      "category": "hybrid",
+      "question": "What is the setup allowance for remote employees and how many distinct sales teams appear in our data?",
+      "expected_route": "hybrid",
+      "actual_route": "hybrid",
+      "route_ok": true,
+      "content_ok": true,
+      "grader_note": "ground_truth=28, found_in_answer=[200.0, 28.0] | qualitative=ok",
+      "passed": true,
+      "answer": "The setup allowance for remote employees is a one-time amount of $200 for equipment, as stated in the document \"EXPENSE & TRAVEL POLICY.pdf.\" \n\nThe number of distinct sales teams that appear in the data is 28, as indicated in the SQL result. \n\nSources:\n- Setup allowance: \"EXPENSE & TRAVEL POLICY.pdf\"\n- Distinct sales teams: SQL result"
+    }
+  ]
+}

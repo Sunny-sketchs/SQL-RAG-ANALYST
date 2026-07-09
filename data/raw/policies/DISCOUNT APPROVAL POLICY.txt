@@ -1,0 +1,37 @@
+DISCOUNT APPROVAL POLICY
+Effective Date: January 1, 2026
+Version: 1.0
+
+DISCOUNT AUTHORIZATION LIMITS
+
+Sales Rep Authority:
+- Sales reps may apply discounts up to 15% on any order without approval.
+
+Regional Manager Authority:
+- Discounts between 15% and 25% require sign-off from the regional sales manager, 
+  logged in the order notes field.
+
+Finance & VP Authority:
+- Discounts above 25% require Finance approval and are capped at 40% 
+  except for end-of-quarter clearance sales, which may go up to 50% with VP approval.
+
+Commission Impact:
+- Any order with discount_applied greater than 20% is excluded from standard 
+  commission calculations (see Commission Policy) and is instead reviewed under 
+  the Finance Adjustment process.
+
+Documentation Requirements:
+- All discounts must be logged in the order notes field
+- Discounts 15%+ require manager/finance sign-off
+- Discounts 25%+ require Finance approval with business justification
+- End-of-quarter clearance sales 40%+ require VP approval
+
+Approval Workflow:
+1. Sales Rep applies discount ≤15% → Auto-approved
+2. Sales Rep applies discount 15-25% → Regional Manager review → Approved/Rejected
+3. Sales Rep applies discount 25-40% → Finance review → Approved/Rejected
+4. Sales Rep applies discount 40-50% (Q-end clearance) → VP review → Approved/Rejected
+5. Any discount >50% → Rejected (not permitted)
+
+Approved by: VP Sales Operations
+Last Updated: July 4, 2026
