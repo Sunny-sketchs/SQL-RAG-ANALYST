@@ -276,6 +276,37 @@ facts, LLM-judged for qualitative ones), and writes a JSON report to
 
 ---
 
+## Current Accuracy
+
+**76% (38/50) on internal eval suite** — last updated 2026-07-12
+
+| Category | Passed |
+|---|---|
+| SQL-only | 18/18 (100%) |
+| RAG-only | 11/17 (65%) |
+| Hybrid   | 9/15 (60%) |
+
+This is a checkpoint, not a ceiling — the pipeline and eval suite are both
+under active iteration. Not every failure indicates a pipeline bug; some
+trace back to inaccurate `ground_truth_sql`/expected-fact values in the eval
+CSV itself, surfaced by cross-checking failures against the source policy
+documents and sales data directly. Open items:
+
+- A router misclassification (a `rag_only` question routed to `hybrid`)
+  introduced by a recent prompt-compression pass, under investigation.
+- Two qualitative grading failures on hybrid compliance questions where the
+  correct number was present in the answer but the LLM-judge grader flagged
+  the surrounding reasoning — see [Known limitations](#known-limitations).
+- A handful of eval CSV rows with mismatched or fabricated expected facts
+  (e.g. a reimbursement figure not present in any source policy document),
+  scheduled for correction.
+
+Accuracy is tracked per commit as prompts, routing logic, and the eval
+fixtures themselves are refined — see commit history for the iteration
+trail.
+
+---
+
 ## Keeping the deployment warm
 
 Render's free tier spins down services after ~15 minutes of inactivity, and
