@@ -13,6 +13,7 @@ def get_llm(provider: str | None = None):
             model=settings.llm_model,
             api_key=settings.openai_api_key,
             temperature=0,
+            max_tokens=settings.llm_max_output_tokens,
         )
 
     if provider == "gemini":
@@ -23,6 +24,7 @@ def get_llm(provider: str | None = None):
             model="gemini-2.5-flash",  # gemini-1.5-flash was retired; this is current stable as of mid-2026
             google_api_key=settings.gemini_api_key,
             temperature=0,
+            max_tokens=settings.llm_max_output_tokens,
         )
 
     raise ValueError(f"Unknown llm_provider: {provider}")

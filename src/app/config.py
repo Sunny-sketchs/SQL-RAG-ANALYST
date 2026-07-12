@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     embedding_model: str = "text-embedding-3-small"
 
     daily_token_limit: int = 50_000  # per-user daily cap across all nodes
+    llm_max_output_tokens: int = 500  # per-call output cap; router/sql-gen need far less, synthesis needs more headroom
 
     log_level: str = "INFO"
     app_name: str = "SQL-RAG-Analyst"
