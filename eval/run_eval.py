@@ -53,10 +53,8 @@ def value_match(answer: str, expected, tolerance: float = 0.5) -> bool:
     return), plain strings, and None (missing/empty ground truth)."""
 
     if expected is None:
-        return False  # no ground truth to check against — always fail loudly, don't silently pass
+        return False
 
-    # bool is technically a subclass of int in Python — exclude it explicitly
-    # so a boolean ground truth (if ever added) isn't mistreated as numeric.
     if isinstance(expected, bool):
         return str(expected).lower() in answer.lower()
 
@@ -68,9 +66,6 @@ def value_match(answer: str, expected, tolerance: float = 0.5) -> bool:
     if isinstance(expected, str):
         return expected.strip().lower() in answer.lower()
 
-    # Defensive fallback — if get_ground_truth() ever returns something
-    # unexpected (e.g. a date, a list), fail explicitly rather than crash,
-    # and this is visible in the eval report as a real gap to investigate.
     return False
 
 
@@ -137,7 +132,7 @@ async def main():
             print(f"Running #{row['id']} [{row['category']}]: {row['question'][:60]}...")
             result = await run_one(client, row)
             results.append(result)
-            status = "✅ PASS" if result["passed"] else "❌ FAIL"
+            status = "PASS" if result["passed"] else "FAIL"
             print(f"  {status} — route: {result.get('actual_route')} — {result.get('grader_note', result.get('error', ''))}")
 
     total = len(results)

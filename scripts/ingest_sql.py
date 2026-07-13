@@ -36,17 +36,11 @@ def main():
     df = df.rename(columns=COLUMN_MAP)
     df = df[list(COLUMN_MAP.values())]
 
-    # Order numbers have stray spaces: "SO - 000101" -> normalize if you want
-    # exact matching later; leaving as-is preserves the raw value.
     df["order_number"] = df["order_number"].str.strip()
 
-    # Dates are DD-MM-YYYY, not ISO — dayfirst=True is required or pandas
-    # will silently mis-parse anything where day <= 12.
     for col in DATE_COLS:
         df[col] = pd.to_datetime(df[col], dayfirst=True, errors="coerce")
 
-    # Money columns have comma thousand-separators, so they load as strings
-    # (e.g. "1,001.18") — strip commas before casting to float.
     for col in MONEY_COLS:
         df[col] = (
             df[col]

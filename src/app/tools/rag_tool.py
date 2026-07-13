@@ -11,8 +11,7 @@ logger = logging.getLogger(__name__)
 
 TOP_K = 3
 
-# Embedding token usage isn't exposed via LangChain's aembed_query interface,
-# so this is an estimate based on tiktoken's tokenizer, not exact API usage.
+
 _encoding = tiktoken.encoding_for_model(settings.embedding_model)
 
 

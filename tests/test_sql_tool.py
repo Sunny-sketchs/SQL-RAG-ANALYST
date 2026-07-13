@@ -18,8 +18,6 @@ class TestSQLValidation:
         sql = _validate_sql("SELECT * FROM sales LIMIT 5")
         assert sql.lower().count("limit") == 1
 
-    # --- Injection / malicious attempts ---
-
     def test_rejects_drop_table(self):
         with pytest.raises(ValueError):
             _validate_sql("DROP TABLE sales")
@@ -37,7 +35,6 @@ class TestSQLValidation:
             _validate_sql("INSERT INTO sales (order_number) VALUES ('hacked')")
 
     def test_rejects_stacked_statement_via_semicolon(self):
-        # Classic injection: valid SELECT followed by a destructive statement
         with pytest.raises(ValueError):
             _validate_sql("SELECT * FROM sales; DROP TABLE sales;")
 
@@ -50,7 +47,6 @@ class TestSQLValidation:
             _validate_sql("EXPLAIN SELECT * FROM sales")
 
     def test_rejects_create_extension_abuse(self):
-        # Guards against LLM being tricked into privilege-adjacent statements
         with pytest.raises(ValueError):
             _validate_sql("CREATE TABLE evil AS SELECT * FROM sales")
 
@@ -63,18 +59,14 @@ class TestSQLValidation:
             _validate_sql("GRANT ALL PRIVILEGES ON sales TO public")
 
     def test_case_insensitive_keyword_detection(self):
-        # Guardrail should not be bypassable via case tricks
         with pytest.raises(ValueError):
             _validate_sql("DrOp TaBLe sales")
 
     def test_rejects_comment_based_smuggling(self):
-        # SQL comment used to try to hide a second statement — the semicolon
-        # check should still catch this since it's a hard block on ';' at all.
         with pytest.raises(ValueError):
             _validate_sql("SELECT * FROM sales; -- DROP TABLE sales")
 
     def test_select_with_subquery_still_allowed(self):
-        # Make sure legitimate complex SELECTs aren't over-blocked
         sql = _validate_sql(
             "SELECT * FROM sales WHERE unit_price > (SELECT AVG(unit_price) FROM sales)"
         )
@@ -101,7 +93,4 @@ class TestPromptInjectionViaQuery:
         async with AsyncSessionLocal() as session:
             result = await run_sql_tool(malicious_query, session)
 
-        # Either the LLM refuses to generate destructive SQL (most likely),
-        # or if it does, _validate_sql must catch it — result should NOT
-        # claim success, and the table must still exist afterward.
         assert "drop" not in result.lower() or "could not run" in result.lower() or "failed" in result.lower()

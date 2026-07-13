@@ -55,8 +55,6 @@ async def ask(request: AskRequest, session: AsyncSession = Depends(get_db)):
     try:
         await record_usage(session, request.user_id, "total", tokens_used)
     except Exception:
-        # Don't fail the whole request just because usage logging failed —
-        # the answer is already generated and paid for; log and move on.
         logger.exception("Failed to record usage for user: %s", request.user_id)
 
     return AskResponse(

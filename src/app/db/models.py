@@ -5,9 +5,6 @@ from pgvector.sqlalchemy import Vector
 
 Base = declarative_base()
 
-# Embedding dim is pinned to OpenAI's text-embedding-3-small (1536).
-# LLM_PROVIDER only swaps the chat/generation model, not embeddings.
-
 
 class Sale(Base):
     __tablename__ = "sales"
@@ -21,7 +18,6 @@ class Sale(Base):
     ship_date = Column(DateTime, nullable=True)
     delivery_date = Column(DateTime, nullable=True)
     currency_code = Column(String)
-    # Raw IDs, not FKs — no lookup tables exist in this dataset.
     sales_team_id = Column(String, index=True)
     customer_id = Column(String, index=True)
     store_id = Column(String, index=True)

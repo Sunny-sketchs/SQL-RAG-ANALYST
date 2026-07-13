@@ -15,12 +15,12 @@ def check_sync_connection():
         engine = create_engine(settings.sync_database_url)
         with engine.connect() as conn:
             version = conn.execute(text("SELECT version();")).scalar()
-            print(f"✅ Connected. Postgres version: {version.split(',')[0]}")
+            print(f"Connected. Postgres version: {version.split(',')[0]}")
 
             db_name = conn.execute(text("SELECT current_database();")).scalar()
-            print(f"✅ Connected to database: {db_name}")
+            print(f"Connected to database: {db_name}")
     except Exception as e:
-        print(f"❌ Sync connection failed: {e}")
+        print(f"Sync connection failed: {e}")
         return False
     return True
 
@@ -32,10 +32,10 @@ async def check_async_connection():
         async with engine.connect() as conn:
             result = await conn.execute(text("SELECT 1;"))
             result.scalar()
-            print("✅ Async connection works.")
+            print("Async connection works.")
         await engine.dispose()
     except Exception as e:
-        print(f"❌ Async connection failed: {e}")
+        print(f"Async connection failed: {e}")
         return False
     return True
 
@@ -49,11 +49,11 @@ def check_extension():
                 text("SELECT extname FROM pg_extension WHERE extname = 'vector';")
             ).fetchone()
             if result:
-                print("✅ vector extension is installed.")
+                print("vector extension is installed.")
             else:
-                print("⚠️  vector extension NOT installed yet (init_db.py will create it).")
+                print(" vector extension NOT installed yet (init_db.py will create it).")
     except Exception as e:
-        print(f"❌ Could not check extension: {e}")
+        print(f" Could not check extension: {e}")
 
 
 def check_tables():
@@ -66,28 +66,28 @@ def check_tables():
             ).fetchall()
             tables = [r[0] for r in rows]
             if tables:
-                print(f"⚠️  Tables already exist: {tables}")
+                print(f"  Tables already exist: {tables}")
                 print("   (init_db.py will SKIP creation if 'sales' or 'documents' are present)")
             else:
-                print("✅ No tables yet — clean slate, init_db.py will create them.")
+                print(" No tables yet — clean slate, init_db.py will create them.")
     except Exception as e:
-        print(f"❌ Could not list tables: {e}")
+        print(f" Could not list tables: {e}")
 
 
 def check_env():
     print("--- .env sanity check ---")
     ok = True
     if not settings.database_url.startswith("postgresql+asyncpg://"):
-        print(f"❌ DATABASE_URL should start with 'postgresql+asyncpg://', got: {settings.database_url[:30]}...")
+        print(f" DATABASE_URL should start with 'postgresql+asyncpg://', got: {settings.database_url[:30]}...")
         ok = False
     else:
-        print("✅ DATABASE_URL has correct asyncpg prefix.")
+        print(" DATABASE_URL has correct asyncpg prefix.")
 
     if not settings.openai_api_key or not settings.openai_api_key.startswith("sk-"):
-        print("❌ OPENAI_API_KEY missing or malformed.")
+        print(" OPENAI_API_KEY missing or malformed.")
         ok = False
     else:
-        print("✅ OPENAI_API_KEY looks present.")
+        print(" OPENAI_API_KEY looks present.")
 
     return ok
 
@@ -110,6 +110,6 @@ if __name__ == "__main__":
 
         print("\n" + "=" * 50)
         if sync_ok and async_ok:
-            print("✅ All checks passed. Safe to run: python -m scripts.init_db")
+            print(" All checks passed. Safe to run: python -m scripts.init_db")
         else:
-            print("❌ Fix connection issues above before running init_db.py")
+            print(" Fix connection issues above before running init_db.py")

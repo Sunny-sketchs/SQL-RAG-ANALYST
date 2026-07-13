@@ -21,7 +21,7 @@ def get_llm(provider: str | None = None):
         if not settings.gemini_api_key:
             raise ValueError("GEMINI_API_KEY not set but llm_provider=gemini")
         return ChatGoogleGenerativeAI(
-            model="gemini-2.5-flash",  # gemini-1.5-flash was retired; this is current stable as of mid-2026
+            model="gemini-2.5-flash",
             google_api_key=settings.gemini_api_key,
             temperature=0,
             max_tokens=settings.llm_max_output_tokens,

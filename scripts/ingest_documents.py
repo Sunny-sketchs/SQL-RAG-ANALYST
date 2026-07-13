@@ -12,7 +12,7 @@ from src.app.config import settings
 from src.app.db.models import Document, Chunk
 
 POLICY_DIR = "data/raw/policies"
-CHUNK_SIZE = 800  # characters, simple fixed-size chunking
+CHUNK_SIZE = 800
 CHUNK_OVERLAP = 100
 
 client = OpenAI(api_key=settings.openai_api_key)
@@ -48,7 +48,7 @@ def main():
 
         doc = Document(filename=filename, content=full_text)
         session.add(doc)
-        session.flush()  # get doc.id before inserting chunks
+        session.flush()
 
         for chunk_content in chunk_text(full_text):
             vector = embed(chunk_content)
