@@ -7,7 +7,9 @@ from src.app.config import settings
 
 
 async def get_today_usage(session: AsyncSession, user_id: str) -> int:
+    # Use offset-naive utcnow to align perfectly with TIMESTAMP WITHOUT TIME ZONE columns
     today_start = datetime.utcnow().replace(hour=0, minute=0, second=0, microsecond=0)
+
     stmt = select(func.coalesce(func.sum(UsageLog.tokens), 0)).where(
         UsageLog.user_id == user_id,
         UsageLog.created_at >= today_start,

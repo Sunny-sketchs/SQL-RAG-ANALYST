@@ -37,4 +37,4 @@ services:
         fromService:
           type: web
           name: sql-rag-backend
-          envVarKey: RENDER_INTERNAL_URL
+          envVarKey: RENDER_INTERNAL_URLs

@@ -50,6 +50,10 @@ Rules:
   EXTRACT(QUARTER FROM column) = N, not date ranges, unless a year is given.
 - "Revenue" = net of discount by default:
   SUM(order_quantity * unit_price * (1 - discount_applied)).
+- "Revenue" = net of discount by default:
+  SUM(order_quantity * unit_price * (1 - discount_applied)).
+- "Profit" = (unit_price - unit_cost) * order_quantity, before discount,
+  unless the question explicitly asks for discount-adjusted profit.
 
 Question: {query}
 
@@ -64,6 +68,9 @@ A numeric result of 0 is a valid, complete answer — state it, don't treat it a
 
 For schedules across labeled periods (e.g. "Month 1-2", "Month 3-4"), count the actual
 periods listed rather than estimating a total — show your reasoning if summarizing.
+An open-ended range like "Month 5+" marks the point when a ramp is complete and the
+standard rate applies — it is not part of the ramp and contributes zero months to any
+ramp-length count.
 
 Question: {query}
 

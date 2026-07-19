@@ -11,8 +11,8 @@ class Settings(BaseSettings):
     llm_model: str = "gpt-4o-mini"
     embedding_model: str = "text-embedding-3-small"
 
-    daily_token_limit: int = 50_000
-    llm_max_output_tokens: int = 500
+    daily_token_limit: int = 200_000
+    llm_max_output_tokens: int = 1000
 
     log_level: str = "INFO"
     app_name: str = "SQL-RAG-Analyst"

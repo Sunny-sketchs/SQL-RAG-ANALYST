@@ -14,7 +14,7 @@ app = FastAPI(title=settings.app_name, version=settings.app_version)
 app.include_router(router)
 
 
-@app.api_route("/health", methods=["GET", "HEAD"])
+@app.api_route("/health", methods=["GET", "HEAD"], operation_id="check_system_health")
 async def health(session: AsyncSession = Depends(get_db)):
     db_status = "ok"
     try:

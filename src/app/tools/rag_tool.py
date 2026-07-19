@@ -9,7 +9,7 @@ from src.app.config import settings
 
 logger = logging.getLogger(__name__)
 
-TOP_K = 3
+TOP_K = 5
 
 
 _encoding = tiktoken.encoding_for_model(settings.embedding_model)
