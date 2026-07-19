@@ -278,28 +278,45 @@ facts, LLM-judged for qualitative ones), and writes a JSON report to
 
 ## Current Accuracy
 
-**76% (38/50) on internal eval suite** — last updated 2026-07-12
+**84% (42/50) on internal eval suite** — last updated 2026-07-20
 
 | Category | Passed |
 |---|---|
 | SQL-only | 18/18 (100%) |
 | RAG-only | 11/17 (65%) |
-| Hybrid   | 9/15 (60%) |
+| Hybrid   | 13/15 (87%) |
 
-This is a checkpoint, not a ceiling — the pipeline and eval suite are both
-under active iteration. Not every failure indicates a pipeline bug; some
-trace back to inaccurate `ground_truth_sql`/expected-fact values in the eval
-CSV itself, surfaced by cross-checking failures against the source policy
-documents and sales data directly. Open items:
+Up from 76% (2026-07-12) after three targeted fixes, each confirmed with
+isolated before/after evidence rather than assumption:
+
+- **Retrieval recall regression** — a prior token-optimization pass reduced
+  top-k chunk retrieval from 5 to 3, which caused one correct policy chunk to
+  fall outside the retrieved set. Reverted to top-k=5 after confirming the
+  miss in logs.
+- **Ambiguous profit definition** — SQL generation inconsistently included or
+  excluded discount adjustment when computing "profit" across otherwise
+  identical questions. Fixed by explicitly defining pre-discount profit as
+  the default in the SQL generation prompt, matching how "revenue" was
+  already defined.
+- **Open-ended schedule miscounting** — the synthesis step miscounted
+  policy schedules with an open-ended final period (e.g. "Month 5+") as an
+  additional discrete period rather than the point a ramp completes. Fixed
+  with an explicit rule in the synthesis prompt; required two iterations to
+  fully resolve.
+
+Open items:
 
 - A router misclassification (a `rag_only` question routed to `hybrid`)
-  introduced by a recent prompt-compression pass, under investigation.
-- Two qualitative grading failures on hybrid compliance questions where the
-  correct number was present in the answer but the LLM-judge grader flagged
-  the surrounding reasoning — see [Known limitations](#known-limitations).
-- A handful of eval CSV rows with mismatched or fabricated expected facts
-  (e.g. a reimbursement figure not present in any source policy document),
-  scheduled for correction.
+  remains unresolved.
+- One hybrid failure is a confirmed instance of the documented
+  [SQL/RAG independence limitation](#known-limitations): the correct answer
+  requires a numeric threshold (15%) that exists only in retrieved policy
+  text, but SQL generation defaulted to a different, previously-seen
+  threshold (20%) instead of deriving it from the RAG context.
+- A handful of eval CSV rows have mismatched or fabricated expected facts
+  not present in the source policy documents, and at least one qualitative
+  grading failure appears to be a stricter-than-necessary LLM-judge
+  assessment of an already-correct answer — both scheduled for review.
 
 Accuracy is tracked per commit as prompts, routing logic, and the eval
 fixtures themselves are refined — see commit history for the iteration
